@@ -1,11 +1,3 @@
-'''
-Author: your name
-Date: 2020-10-24 10:23:18
-LastEditTime: 2020-10-24 10:49:16
-LastEditors: Please set LastEditors
-Description: In User Settings Edit
-FilePath: \pythontip\end_ji_or_ou.py
-'''
 L = [2, 8, 3, 50]
 count2 = 0
 count5 = 0
