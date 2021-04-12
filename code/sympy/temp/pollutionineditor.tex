@@ -1,0 +1,748 @@
+\documentclass[UTF8]{ctexart}
+\usepackage{CJK}
+\usepackage{listings}
+\usepackage{color,xcolor}
+\newtheorem{thm}{定理}%定义一个定理环境，有一个可选参数，即定理的名字
+%在定义时这个参数用{}表示定理名的前缀，但在使用时参数用[]
+%  同时会计数
+\newenvironment{myquote}{\begin{quote}\zihao{-5}\kaishu}{\end{quote}}
+%定义myquote环境，第一个参数是环境开始时代码，第二个参数是结束时代码，
+%将这两部分代码嵌入至新环境中，当要更改时直接在此处更改即可
+\newcommand\degree{^\circ}
+%定义新命令，newcommand的两个参数分别是新命令和新命令的定义
+
+\usepackage{graphicx}%插图的宏包
+\usepackage{float}%浮动体环境
+\usepackage{amsmath}%有公式引用命令\eqref
+\usepackage{geometry}%可以设置页面尺寸
+\usepackage{txfonts}
+\geometry{a4paper,left=2.5cm,right=2.5cm,bottom=2.5cm,top=2.5cm}%A6纸大小，版心居中，长宽占页面0.8倍
+\usepackage[format=hang,font=small,textfont=it]{caption}
+%所有标题使用悬挂对齐方式（编号相左对齐，整体用小字号，而标题文本用斜体(对汉字来说就是楷书)
+\usepackage[nottoc]{tocbibind}%宏包默认在目录中加入目录项本身、参考文献、索引等项目
+%用Nott选项取消加入目录项本身
+\usepackage[justification=centering]{caption} %caption可设置标题格式
+\usepackage[center]{titlesec}%标题
+
+    \usepackage{amssymb}
+    \usepackage{abstract}
+    \usepackage{graphicx}
+    \usepackage{caption}
+    \usepackage{subfigure}
+    \usepackage{fancyhdr}
+    \usepackage{booktabs}%toprule和midrule命令的宏包
+  
+    \usepackage{geometry}
+\usepackage{mathptmx}%公式字体
+    \definecolor{mygreen}{rgb}{0,0.6,0}
+    \definecolor{mygray}{rgb}{0.5,0.5,0.5}
+    \definecolor{mymauve}{rgb}{0.58,0,0.82}
+    \lstset{
+backgroundcolor=\color{white},   % choose the background color
+ % size of fonts used for the code或改成\small\monaco稍大
+numbers=left,                        % 设置行号
+           % 设置行号字体大小
+columns=fullflexible,
+breaklines=true,                 % automatic line breaking only at whitespace
+captionpos=b,                    % sets the caption-position to bottom
+tabsize=4,                       % 把tab扩展为4个空格，默认是8个太长
+commentstyle=\color{mygreen},    % 设置注释颜色
+escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+keywordstyle=\color{blue},       % 设置keyword颜色
+    % string literal style
+frame=single,                        % 设置有边框
+rulesepcolor=\color{red!20!green!20!blue!20},
+% identifierstyle=\color{red},
+language=matlab,
+}
+\usepackage[font={sf,bf},textfont=md]{caption}
+%\usepackage{caption}
+\pagestyle{empty}
+\newcommand{\normal}{\fontsize{10pt}{1.2pt}\selectfont}
+\newcommand{\sanhao}{\heiti\zihao{3}}
+\newcommand{\sihao}{\heiti\zihao{4}}
+\newcommand{\xiaosihao}{\heiti\zihao{-4}}
+\newcommand{\wuhao}{\songti\zihao{-5}}
+\newcommand{\songsihao}{\songti\zihao{-4}}
+\newcommand{\Engsihao}{\heiti\zihao{-4}}
+\titleformat*{\section}{\sihao\centering}
+\titleformat*{\subsection}{\xiaosihao}
+\titleformat*{\subsubsection}{\xiaosihao}
+\titleformat*{\paragraph}{\songti\zihao{-4}}
+\titleformat*{\subparagraph}{\songti\zihao{-4}}
+%\setmainfont{Times New Roman}
+\linespread{1.25}
+\bibliographystyle{plain}
+\pagestyle{fancy}
+% 设置英文字体
+%\setmainfont{Times New Roman}
+%\newcommand{\tm}{\fontspec{Times New Roman}}
+
+
+
+\usepackage{caption}
+%设置图片标题字体格式
+\captionsetup{font=small}
+
+\begin{document}
+\songsihao
+\begin{center}
+    \sanhao{基于回归分析的污染源位置确定模型}
+   
+\end{center}
+
+\section{摘要}
+针对问题一，题目指出污染物浓度随距离的衰减函数为指数函数关系，根据题目所给数据， 
+对污染物的扩散函数进行{\bf 线性化}，再通过\emph{\bf 线性最小二乘法}进行\emph{\bf 线性回归}，求出了实验数据
+扩散函数为  $C=100.0092 e^{-0.020011r}$ ,对自然下的污染物扩散，
+引入自然因素作用方向$\theta$及作用强度$\rho$,得到了扩散函数。\\
+针对问题二，首先给出了普通\emph{\bf 非线性最小二乘}的思想，其次由于题目数据的特殊性，
+给出了求解问题的两种方案，方案一假设每个方向的扩散无差异性，其次提出了\emph{\bf 加权
+最小二乘法},借助\emph{\bf 高斯牛顿迭代法}求出了加权最小二乘法的解为污染源位置\textit{
+ (-2.8978,4.4011)} 污染物浓度为  \textit{182.7441} ,
+方案二考虑了扩散的差异性，首先通过摒弃自然因素作用的两个参数以及一个可能异常
+的观测点通过\emph{\bf 牛顿迭代法}求出污染源信息，其次重新考虑摒弃的参数及观测点，
+解出了污染源及自然因素的作用强度信息，污染源位置\textit{(-1.4180,4.1000)}, 污染物浓度为\textit{199.5436}  ，
+最后对自然因素的作用方向进行了\emph{\bf 灵敏度分析}，发现结果具有较强的稳定性。
+\\
+针对问题三,给出了求解多点污染源信息的一般解法，考虑了不同污染源的污染物
+扩散过程引起的相互影响问题，引入了不同污染源之间的\emph{\bf 交叉项}，并分析
+了不同污染源影响情况与扩散公式的对应关系。最后，给出了对不同情况下如何对扩散
+函数进行求解的方案。囿于题目数据，没有再进行求解。\\
+{\bf 关键词：}线性化 \quad 最小二乘法\quad 加权最小二乘法\quad 高斯牛顿迭代法\quad 牛顿迭代法
+\newpage
+    \section{问题重述}
+      \subsection{问题一}
+         对实验室测定的一组数据，在已知污染物浓度随距离
+         的关系为指数函数的情况下，模拟得到该污染物的扩散情况。
+      \subsection{问题二}
+         已知平面上四个点的位置及对应的污染物浓度,根据问题一得到的扩散
+         情况，大致确定污染源的位置及污染物浓度。
+      \subsection{问题三}
+         更一般的，当存在多点污染源时，如何解出不同污染源的位置及
+         污染物浓度，此时，又需要测定多少数据。
+         
+\section{模型假设}
+  \begin{enumerate}
+    \item 所有测定都保证污染物浓度已经相当稳定，即不考虑时间因素
+    \item 所有的测定都没有非常大的误差（允许误差但无异常值）
+    \item 不考虑传播过程的介质改变问题（当然也不考虑障碍物）
+    
+  \end{enumerate}
+\section{符号说明}
+  \begin{table}[htbp]
+    \centering
+    \caption{符号说明表}
+    \begin{tabular}{c c}
+      \toprule[1.5pt]
+      符号 & 意义\\
+      \midrule[1pt]
+      $ C_0 $ & 污染源污染物浓度\\
+      $ (x_0,y_0) $ & 污染源坐标\\
+      $ C $ & 任意点的污染物浓度\\
+      $ r_i $ & 实验测得的第 i 组数据的距离\\
+      $ C_i $ & 实验测得的第 i 组数据的浓度\\
+      $ (x_i,y_i) $ & 平面内第 i 个点的位置\\
+      $ D_i $ & 实际测得的第 i 个点的浓度\\
+   
+      \bottomrule[1.5pt]
+    \end{tabular}
+  \end{table}
+       
+\newpage
+    
+\section{问题分析}
+    \subsection{问题一}
+      针对问题一，由于题目指出污染物浓度随距离的衰减函数为指数函数关系，
+      因此考虑对题目所给数据进行参数估计（指数型拟合），
+      能够得出当污染源的浓度为题目所给数据（100.0）时，
+    污染物浓度随时间的关系，由于题目没有给出更多的数据，
+    当污染源浓度为不同值时，无法确定扩散函数是否具有相同的趋势，
+    为方便分析，这里假设对不同的污染源浓度，其扩散函数线性相关。
+    进而可以得到理想状况下不同污染源浓度的扩散函数。
+    而对于现实中的污染物扩散问题，由于自然因素，在不同方向上的
+    扩散可能有所不同，这里假设由自然因素造成的影响是单方向的，
+    因此考虑在原扩散函数的不同方向前加扩散系数即可。
+    \subsection{问题二}
+      在得到自然条件下的扩散函数后，可以对测得的数据进行拟合。
+      由于题目所给数据不够充足，观测数目小于参数个数，因此给出两种
+      方案：\\
+      方案一：不考虑不同方向的扩散差异，进行非线性回归\\
+      注意到题目所给数据中，A点和D点具有相同的污染物浓度，
+      如果所给数据完全精确，污染源应该位于线段AD的中垂线上，
+      那么B点和C点应该有相同的污染物浓度，但实际上B点与C点
+      污染物浓度相差较大，因此可以认定污染物浓度的测定有误差。
+      原问题即转化为寻一点和一初始浓度，使所有数据点的实际污染物浓度
+      与理论的污染物浓度的误差最小。通过多元非线性回归可以得到误差最小
+      时的初始浓度及污染源位置。\\
+      方案二：考虑不同方向的扩散差异，大概估计一个参数，对余下数据求解\\
+      根据题目数据大概估计一个参数，余下的数据是一个有唯一解的方程组，可以
+      求出污染源位置。最后，可以对估计的参数进行灵敏度分析。
+    \subsection{问题三}
+      当分析更多的点污染源时，两污染源传播中会发生相遇，
+      当不考虑相遇造成的影响时，可以认为各点的污染物浓度是简单的
+      叠加，如果再考虑相遇造成的影响，可以加上污染源引起的交叉项。
+      重新进行多元非线性回归，可以得到各个点的初始浓度及污染物浓度
+\newpage
+\section{模型建立}
+ \subsection{问题一}
+   设污染物浓度随时间变化关系为
+   $$ C=e^{ar+b} $$
+   两边取对数得
+   $$\ln{C}=ar+b$$
+   通过最小二乘法进行线性回归，求
+   $$f(a,b)=\sum_{i = 0}^{10}  {(ar_i+b-\ln{C_i})^2}$$
+  
+   $$  \min{f(a,b)}$$
+   
+   根据二元函数极值的求法，求
+   \begin{equation*}
+  \left\{
+    \begin{array}{rc}\frac{\partial f}{\partial a}=0\\
+   \frac{\partial f}{\partial b}=0 \end{array}\right.
+    \end{equation*}
+  得正规方程组
+   \begin{equation}\label{p1.1}
+    \left\{
+      \begin{array}{rcl}
+        a \sum\limits_{i =0}^{10}{r_i^2}+b \sum\limits_{i =0}^{10}{t_i}=
+        \sum\limits_{i=1}^{10}{r_i\ln{C_i}}\\
+        a \sum\limits_{i =0}^{10}{r_i}+11b=\sum\limits_{i=0}^{10}{\ln{C_i}}
+      \end{array}
+    \right.
+   \end{equation}
+   解得 $a$、$b$ 的值后，在理想情况下，
+   对污染源污染物浓度为 $C_0$ ,则平面内某点 $(x,y)$ 的污染物浓度
+   \begin{equation}\label{p1.2}
+    C=C_0e^{a\cdot \sqrt{(x-x_0)^2+(y-y_0)^2}} 
+   \end{equation}
+   在单方向的自然因素下，设作用方向与 x 轴夹角为 $\theta$ ($0\leq \theta<\pi$)
+   ,作用强度为 $\rho $, 则
+   \begin{equation}\label{p1.3}
+    C=C_0 e^{a \sqrt{(\rho\cos{\theta}+1)(x-x0)^2+(\rho\sin{\theta}+1)(y-y_0)^2}}
+   \end{equation}
+  \subsection{问题二}
+  
+
+    \subsubsection{方案一的建立}
+    首先对于多参数非线性模型，根据普通最小二乘原理给出参数估计的一般方法。
+    \\
+    设 $\emph{X}$ 是给出的自变量矩阵，$\emph{Y}$ 是 $\emph{X}$ 对应的因变量列向量，
+    $\emph{f}$ 是需要拟合的函数，$ \beta$ 是需要确定的参数列向量，${\varepsilon}$
+    是对应的误差， 则有
+    $$ Y=f(X,\beta)+\varepsilon $$
+    应使残差平方和最小，即
+    \begin{equation}\label{aim}
+       \min{ \{\varepsilon ^{T} \cdot \varepsilon\}} 
+    \end{equation}
+       求
+    \begin{equation}
+      \frac{\partial}{\partial \beta } (f(X,\beta)^{T})
+      \cdot (Y-f(X,\beta))={0}
+    \end{equation}
+    (0是与$\beta $的长度相同的0向量)\\
+    事实上，可以通过高斯-牛顿迭代法求得\ref{aim}的极小值点。
+    
+
+    由于每一个观测值的不确定性有所不同，需要对不同观测的
+    偏差进行加权\cite{zhuangshijian}，以反应不同观测数据之间的相对重要性。
+    加权的基本思想可以描述为：如果已知观测值 $y_k$ 的不确定度高于
+     $y_l$ ,那么权值 $\omega_k$ 就应该低于 $\omega_l$ 。\cite{key}
+    \\
+    若观测值 $y_i$ 的概率分布函数中的标准不确定度为 $\sigma$ ，则
+    最优加权值应该为：
+     $$\omega_i=\frac{1}{\sigma_i ^2}$$
+    \\
+    由于无法直接获得 $\sigma$ ,这里考虑用前面一次拟合的残差的平方项代替 $\sigma_i^2$来构造权值，
+    即有
+    $$ \Delta_i =y_i-\hat{y} $$
+    $$\omega_i=\frac{1}{{\sigma_i}^2}\approx \frac{1}{\Delta _i^2} $$
+    另外，为避免小误差对权重的影响（此时权重将很大，不同观测点的相对重要性无法很好体现），
+    可以设置下界$\lambda_L$来实现\cite{key},即
+    \begin{eqnarray} %\label{p2.3}，不能加标签,但可在内部加标签
+      \omega_i=&=&%还不知道有啥用
+      \left\{
+      \begin{array}{lll}\label{p2.3}
+         \frac{1}{\lambda_L^2}
+    \mbox{，当} |\Delta_i|<\lambda_L \mbox{时}\\
+     \frac{1}{\Delta_i^2} \ \mbox{,其他}
+      \end{array}\right. 
+    \end{eqnarray}
+    \ref{p2.3}中的门限值 $\lambda_L$ 可以由下式定义：\cite{key}
+    \begin{equation}\label{p2.4}
+      \lambda_L=\kappa\hat{\sigma}_y
+    \end{equation}
+    $\kappa$ 为与应用背景相关因子，因为$\kappa$取很小门限值 \ref{p2.4} 
+    将失去意义，可以考虑在一定范围内对$\kappa$取不同的值分别求出拟合情况
+    $\hat{\sigma}$ 为观测值 $y_i$ 标准
+    差的估计值，其表达式为
+    \begin{equation}\label{guji}
+       \hat{\sigma}_y=\sqrt{\frac{1}{N-M}\cdot\frac{\sum
+    \omega_i(\hat{y_i}-y_i)^2}{\frac{1}{N}\cdot \sum{\omega_i}}}
+    \end{equation}
+    其中 N 为数据个数，M 为模型参数个数。可以通过上一次拟合的权值以及偏差
+    根据$\ref{p2.3}$以及$\ref{guji}$求出下一次的权值。
+    得到权值 $\omega$ 后，原普通最小二乘$\ref{aim}$ 就变为
+
+    \begin{equation}\label{aim2.2}
+      \min{\{\varepsilon^T\cdot diag(\omega) \cdot \varepsilon\}}
+    \end{equation}
+    上式即为
+    \begin{equation}
+      \min{\sum_{i=1}^n {(\sqrt{\omega_i}\cdot\varepsilon_i)^2}}
+    \end{equation}
+    同样可以用高斯牛顿迭代求解该式。\\
+    另外，可以通过相关指数法判断加权后的回归方程效果，其表达式为：
+    $$ R^2=1-\frac{\sum\limits_{i=1}^n \omega_i(y_i-\hat{y_i})^2}{\sum\limits_{i=1}^n
+     \omega_i(y_i-\overline{y_i})^2}$$
+    $R^2$ 越接近1说明拟合效果越好\\
+    综合以上，如果通过普通最小二乘法得到的残差平方和很大，可以通过加权最小
+    二乘法寻找权重，
+    寻求最优权重的方法可由下面得到：
+    \begin{enumerate}\label{solve2.1}
+      \item 初始化权值为等权值，并计算出此时的参数及偏差
+      \item 初始化$\kappa$,根据 \ref{p2.4}及 \ref{guji}求出新的权重
+      \item 由新权重根据 $\ref{aim2.2}$ 求出新参数及权重下的相关指数和残差平方和
+      \item 重新设定 $\kappa$,回到2.。
+      \item 比较不同$\kappa$ 下的相关指数、残差平方和。
+    \end{enumerate}
+
+  根据\ref{p1.2}对平面内某点 $(x,y)$ ，污染物浓度与位置的经验公式
+     \begin{equation}\label{p2.1}
+        \hat{C}=\hat{C_0} e^{a\sqrt{(x-\hat{x_0})^2+(y-\hat{y_0})^2}}
+     \end{equation}
+  考虑用最小二乘法进行非线性回归
+    $$ \hat{C_0} e^{a \sqrt{(x_i-\hat{x_0})^2+(y_i-
+    \hat{y_0})^2}}=D_i+\varepsilon_i $$
+  跟据之前的结论可以求解。
+  \subsubsection{方案二的建立}
+  由于题目只有四组观测值，\ref{p1.3}有五个参数，考虑首先对某个参数进行估计，
+  注意到第三组数据有显著不同，而其余三组相差很小，可以考虑首先对自然因素的作用方向 $\theta$ 进行估计。
+  具体做法如下：
+ \begin{itemize}\label{p2.2.1}
+   \item 摒除第三组数据，并不考虑扩散系数，根据\ref{p1.2}对余下方程求解，得到污染源位置及浓度数据
+   \item 考虑扩散系数，将第三组数据与任意一组数据（这里用第二组）联立，并将之前得到的污染源信息代入，
+   根据\ref{p1.3}求解，得到作用强度及作用方向
+   \item 考虑扩散系数，将四组数据联立，将得到的作用方向代入方程，重新根据\ref{p1.3}求解，得到新的污染源信息
+   及作用强度
+ \end{itemize}
+ 以上求解方程可通过牛顿迭代法实现。
+  \subsection{问题三}
+  首先给出确定多点污染源位置的一般解法，对 n 个点污染源，
+  设其位置分别为
+  $$(x_i,y_i) , i=1,2,3\cdots ,n$$ 
+  污染源浓度为
+  $$ C_i , i=1,2,3\cdots,n $$
+  则当不考虑不同污染源间的相互影响，对平面内任一点$(x,y)$有
+  \begin{equation}\label{p3.1}
+    C=\sum\limits_{i=1}^{n}{C_i e^{a\cdot \sqrt{k_{xi}(x-x_i)^2+k_{yi}(y-y_i)^2}}}
+  \end{equation}
+  其中 $k_{xi}$ $k_{yi}$ 分别为第 i 个污染源在 $x$ 和 $y$ 方向的扩散系数。\cite{gaozhen}\\
+  现考虑不同污染源之间的叠加，加入不同污染源之间的交叉项
+  \begin{equation}\label{p3.2}
+    C=\sum\limits_{i=1}^{n}{C_i e^{a\cdot \sqrt{k_{xi}(x-x_i)^2+k_{yi}(y-y_i)^2}}}
+    +\sum\limits_{i<j\leq n}{P_{ij}C_i e^{a\cdot \sqrt{k_{xi}(x-x_i)^2+k_{yi}(y-y_i)^2}}
+    \cdot C_j\cdot e^{a\cdot \sqrt{k_{xj}(x-x_j)^2+k_{yj}(y-y_j)^2}}}
+  \end{equation}
+  当 $P_{ij}<0$ 时，表明第i与第j个污染源点有相互抑制作用，\\
+  当 $P_{ij}>0$ 时，表明第i与第j个污染源点有相互促进作用，\\
+  当 $P_{ij}=0$ 时，表明第i与第j个污染源点无作用，\\
+  考虑模型带来的误差
+    $$\varepsilon=D-C $$
+  综合考虑上述多污染源点模型，既能体现单污染源点之间的叠加，
+  又能体现不同污染源之间的促进与抑制作用。最后可以通过之前得到的结论求解。\\
+  特别地，当只有两个污染源点时
+  \begin{equation}\label{p3.3}
+    C=\sum\limits_{i=1}^{2}{C_i e^{a \cdot \sqrt{k_{xi}(x-x_i)^2+k_{yi}(y-y_i)^2}}}
+    +P_{12}C_1\cdot C_2 e^{a \cdot \sqrt{k_{x1}(x-x_1)^2+k_{y1}(y-y_1)^2}}\cdot 
+    e^{a\cdot \sqrt{k_{x2}(x-x_2)^2+k_{y1}(y-y_2)^2}}
+  \end{equation}
+  该式有11个参数，当观测点有11个时，原问题是可解方程，用牛顿迭代法即可。\\
+  当观测点数目大于11个时，可以通过最小二乘法\ref{aim}求得参数。\\
+  如果最终求得的残差的平方和很大，说明不应该同等对待各个观测点，可以通过加权
+  最小二乘法\ref{aim2.2}及\ref{solve2.1}求得。\\
+  由于题目只给了四个观测点，小于拟合的参数个数，不再进行求解。
+\newpage
+\section{模型求解}
+  \subsection{问题一} 
+  通过matlab对\ref{p1.1}进行求解并绘出了拟合曲线\\
+  \begin{figure}[htbp]
+    \centering
+    \includegraphics[scale=0.7]{p(1.1).jpg}
+    \caption{对数据的拟合图像}
+    \label{pp1.1}
+  \end{figure}
+ \\
+  拟合曲线方程为
+  $$C=100.0092 e^{-0.020011r}$$
+从而当污染源浓度为 $C_0$时
+其扩散函数为
+\begin{equation}\label{p3.2.1}
+ C=C_0 e^{-0.020011\cdot \sqrt{(x-x_0)^2+(y-y_0)^2}}
+\end{equation}
+ 考虑自然因素，扩散函数为
+\begin{equation}\label{p3.2.2}
+  C=C_0 e^{-0.020011 \sqrt{(\rho\cos{\theta}+1)(x-x0)^2+(\rho\sin{\theta}+1)(y-y_0)^2}}
+ \end{equation}
+
+ 
+  \subsection{问题二}
+  
+  \subsubsection{对方案一的求解}
+  首先跟据普通最小二乘法，设置权重为等权重，
+     通过matlab用高斯牛顿迭代对\ref{aim}进行求解，解得
+     $$ x_0=-2.4913,y_0=5.5437$$
+     $$ C_0=180.9926 $$
+     此时的残差平方和为 $578.1119$ ,相关指数 $R_1^2=0.5528$，
+     说明用等权值进行回归效果不理想 ，进而继续根据$\ref{solve2.1}$
+     取 $\kappa$ 在 $0.525-0.925$ 区间内分别求出新权重，
+     并求出该权重下对应的拟合参数，相关指数 $R^2$ 及残差平方和 r。
+     \begin{table}[htbp]
+      \caption{最终数据}
+     \begin{tabular}{|c|c|c|c|c|c|c|}
+      \hline  $\kappa$ &0.425 & 0.525 &0.625 &0.725 &0.825 &0.925 \\
+      \hline  $R^2$    &
+      0.9523  &  0.8927  &  0.7834 &   0.5528   & 0.5528  &  0.5528   \\
+      \hline  $r$    & 366.7063 & 461.2554 & 532.7248 & 578.1119 & 578.1119 & 578.1119   \\
+      \hline  $(x_0,y_0)$ & (-2.897,4.401)   &(-2.341,4.615)  & (-2.150,5.022)  & (-2.491,5.543)  
+       &(-2.491,5.543)  & (-2.491,5.543) \\
+      \hline  $C_0$ &
+      182.7441  & 182.4612 & 181.7364 & 180.9926 & 180.9926 & 180.9926 \\
+    \hline
+    \end{tabular}
+    \end{table}
+    \\
+    当 $\kappa$ 大于等于0.725时，效果与等权值拟合一致。当$\kappa$ 最小
+    等于0.425时具有最好的拟合结果，此时的四个观测点的权值分别为 1.1748， 0.7003，0.8656，1.1748,
+    污染源位置为$(-2.897,4.401)$,污染物浓度为 $182.7441$。\\
+    对不同组的污染源信息分析也可发现，尽管应当对不同的观测点
+    赋予不同的权重，但加权最小二乘与普通最小二乘的结果并没有很大
+    区别，这点与文献\cite{key}得出的结论一致。
+    \\
+     并绘出了此时浓度随位置关系的三维图以及等值线图
+     \begin{figure}[htbp]
+      
+              \centering
+              \includegraphics[scale=0.65]{p2.1.1.jpg}
+              \caption{三维图}
+              \label{pp2.1.1}
+       \end{figure}
+      
+       \begin{figure}
+            \centering
+            \includegraphics[scale=0.65]{p2.1.2.jpg}
+            \caption{等值线图}
+            \label{pp2.1.2}
+    
+          
+     \end{figure}
+     \newpage
+     \subsubsection{对方案二的求解}  
+     根据\ref{p2.2.1}  解出了最终的污染源位置及自然因素的作用情况,结果如下
+ $$
+  (x_0,y_0)=(-1.4180,4.1000), \ C_0=199.5436 $$
+$$ \rho=  2.8167,\ \theta=  1.5854 $$
+绘出了其三维图及等值线图：
+\begin{figure}[htbp]
+  \centering
+  
+          \includegraphics[scale=0.65]{p2..2.1.jpg}
+          \caption{三维图}
+          \label{pp2.1}
+ \end{figure}
+\begin{figure}
+  
+        \centering
+        \includegraphics[scale=0.65]{p2.2.2.jpg}
+        \caption{等值线图}
+        \label{pp2.2}
+  
+      
+ \end{figure}
+\newpage
+\section{模型检验及灵敏度分析}
+只对方案二的求解进行灵敏度分析：\\
+改变通过\ref{p2.2.1} 解出的自然因素的作用方向$\theta$，考察此时污染源信息及作用强度随该
+作用方向的变化情况。
+以下是分别的关系图：
+\begin{figure}[htbp] %图片标注
+  \centering
+  \subfigure*
+  {
+      \begin{minipage}[t]{0.4\linewidth}
+          \centering
+          \includegraphics[scale=0.36]{lingx_0.jpg}
+          \caption{横坐标$x_0$的影响图}
+          \label{1(1)}
+      \end{minipage}
+  }
+  {
+      \begin{minipage}[t]{0.4\linewidth}
+          \centering
+          \includegraphics[scale=0.36]{lingy_0.jpg}
+          \caption{纵坐标$y_0$的影响图}
+          \label{1(2)}
+      \end{minipage}
+  }
+  {
+      \begin{minipage}[t]{0.4\linewidth}
+          \centering
+          \includegraphics[scale=0.36]{lingC_0.jpg}
+          \caption{污染源浓度的影响图}
+          \label{2(1)f}
+      \end{minipage}
+  }
+  {
+      \begin{minipage}[t]{0.4\linewidth}
+          \centering
+          \includegraphics[scale=0.36]{lingrho.jpg}
+          \caption{作用强度的影响图}
+          \label{2(1)c}
+      \end{minipage}
+  }
+    \end{figure}
+    \newpage
+    可以发现作用方向在 $\theta=1.5854$ 附近，
+    污染源信息以及作用强度都没有明显变化，以下是在其周围的部分数据：\\
+    \begin{figure}[htbp]
+      \centering
+      \includegraphics[scale=0.7]{partdata.png}
+      \caption{部分数据}
+      \label{fig:partdata}
+    \end{figure}
+    \\
+    可以发现，$x_0$ 大约在-1至-2.5 之间，$y_0$ 大约在3至5之间
+    $C_0$ 大约在190至220之间， $\rho$ 大约在3至5之间。
+    都没有太大的变化。因此可以认定原解具有较好的稳定性。
+\section{模型评价}
+\subsection{优点}
+\begin{enumerate}
+  \item 给出了单点污染源确定的一般方法，并且基于题目数据进行了一些调整
+  \item 考虑了不同观测点的重要性，利用了加权最小二乘法，使结果更准确
+  \item 给出了求解多点污染源信息的一般解法
+\end{enumerate}
+\subsection{缺点}
+\begin{enumerate}
+  \item 方案一的权重估计并不严格，寻求更优权重可见迭代重加权最小二乘法\cite{yuxiaoyan}
+\end{enumerate}
+
+  \bibliography{in.bib}
+
+\section{附录}
+以下为方案一的求解：
+\begin{lstlisting}
+  clear
+Data=xlsread('data.xlsx');%读取数据
+
+d_dis=Data(1,:);
+d_consis=Data(2,:);
+scatter(d_dis,d_consis);
+hold on;
+y=log(d_consis);
+fit=polyfit(d_dis,y,1);
+fit(2)=exp(fit(2));
+xfit=min(d_dis):0.5:max(d_dis);
+yfit=fit(2)*exp(fit(1)*xfit);
+h=plot(xfit,yfit);
+legend("数据点","拟合曲线");
+set(gca,'fontsize',15);
+title("对数据的拟合图");
+str=['C=' num2str(fit(2)) 'e^{' num2str(fit(1)) 'r}'];%设置字符串
+h2=text(50,60,{str});%绘图
+set(h2,'fontsize',15,'color','r');
+xlabel('距离/m');
+ylabel("浓度");
+a=fit(1);
+%以上是问题一
+
+ X=[-10 ;0;10;0];Y=[0;-10;0;10]; 
+C=[158.198;114.942;151.557;158.198];
+ figure;
+nihe=@(beta,xx)xx(:,4).*beta(3).*exp(xx(1,3).*((xx(:,1)-beta(1)).^2+(xx(:,2)-beta(2)).^2).^0.5);%定义需要拟合的匿名函数
+%nihe=@(beta,xx) beta(3).*exp(xx(1,3).*((xx(:,1)-beta(1)).^2+(xx(:,2)-beta(2)).^2).^0.5)...
+   % +beta(6).*exp(xx(1,3).*((xx(:,1)-beta(4)).^2+(xx(:,2)-beta(5)).^2).^0.5)...
+    %+beta(7)*(beta(3).*exp(xx(1,3).*((xx(:,1)-beta(1)).^2+(xx(:,2)-beta(2)).^2).^0.5))...
+    %.*beta(6).*exp(xx(1,3).*((xx(:,1)-beta(4)).^2+(xx(:,2)-beta(5)).^2).^0.5);
+w=ones(length(X),1);
+xx=[X Y a*ones(length(X),1) w];
+beta0=[-1,1,190];
+Ci=C;
+[beta1,ri,j]=nlinfit(xx,Ci,nihe,beta0);
+betaci=nlparci(beta1,ri,'jacobian',j);%计算回归系数的置信区间
+[yhat,delta]=nlpredci(nihe,xx,beta1,ri,'jacobian',j);%计算C的预测值及置信区间半径
+R1=1-sum((Ci-yhat).^2)/sum((Ci-mean(Ci)).^2);
+k=1;
+
+
+for kappa=0.425:0.1:1.025
+ ll=kappa*(sum(w.*(Ci-beta1(3).*exp(a.*((xx(:,1)-beta1(1)).^2+(xx(:,2)-beta1(2)).^2).^0.5)).^2)/((1/4)*sum(w)))^0.5;
+  w2=1./abs(ri);
+ w2(abs(ri)<ll)=1./ll; %设置门限值
+ w2=w2./norm(w2)*2;%归一化
+ C=Ci.*w2;
+xx=[X Y a*ones(length(X),1) w2];
+beta0=[-1,1,190];
+[beta,r,j]=nlinfit(xx,C,nihe,beta0);
+betaci=nlparci(beta,r,'jacobian',j);%计算回归系数的置信区间
+[yhat,delta]=nlpredci(nihe,xx,beta,r,'jacobian',j);%计算C的预测值及置信区间半径
+R2(k)=1-sum((C-yhat).^2)/sum((C-mean(C)).^2);%相关指数
+r_sum(k)=sum(r.^2);%残差和
+lo(:,k)=[beta(1);beta(2)];%位置
+cc(:,k)=beta(3);%浓度
+ww(:,k)=w2;%权重
+k=k+1;
+end
+
+
+%以下是绘图
+beta=[lo(:,1);cc(1)];
+
+
+xxx=-15:0.2:15;
+yyy=-15:0.2:15;
+[XX,YY]=meshgrid(xxx,yyy);
+Z=beta(3).*exp(a.*((XX-beta(1)).^2+(YY-beta(2)).^2).^0.5);
+ph=mesh(XX,YY,Z);
+set(gca,'fontsize',15);
+xlabel('x/m');
+ylabel('y/m');
+zlabel('C/浓度');
+beta=floor(beta*100)/100;
+str=['(' num2str(beta(1)) ',' num2str(beta(2)) ',' num2str(beta(3)) ')'];
+
+text(beta(1)+0.2,beta(2)+0.3,beta(3),{str},'fontsize',18);
+figure;
+[D,h]=contour(XX,YY,Z);
+clabel(D,h);
+set(gca,'fontsize',12);
+xlabel('x/m');
+ylabel('y/m');
+yhat=yhat./w2;
+yhat=floor(yhat*100)/100;
+for i=1:4
+    str=['\leftarrow' '(' num2str(X(i)) ',' num2str(Y(i)) ',' num2str(yhat(i)) ')'];
+hh=text(X(i),Y(i),str);
+set(hh,'fontsize',15,'color',[0.6 0.6 0.6]);
+box on;
+end
+
+str=['\leftarrow' '(' num2str(beta(1)) ',' num2str(beta(2)) ',' num2str(beta(3)) ')'];
+hh=text(beta(1),beta(2),str);
+set(hh,'fontsize',15,'color',[0.6 0.6 0.6]);
+box on;
+
+
+
+
+
+\end{lstlisting}
+以下为问题二方案二的求解：
+\begin{lstlisting}
+  
+  x=[-10 ;0;10;0;-10];y=[0;-10;0;10;0];
+ C=[158.198;114.942;151.557;158.198];
+ b=-0.02;
+
+
+ff=@(xyc) [xyc(3)*exp(b*((x(1)-xyc(1))^2+(y(1)-xyc(2))^2)^0.5)-C(1);
+%xyc(3)*exp(b*((x(2)-xyc(1))^2+(y(2)-xyc(2))^2)^0.5)-C(2);
+xyc(3)*exp(b*((x(3)-xyc(1))^2+(y(3)-xyc(2))^2)^0.5)-C(3);
+xyc(3)*exp(b*((x(4)-xyc(1))^2+(y(4)-xyc(2))^2)^0.5)-C(4);]
+
+rr=fsolve(ff,[1 1 180]);
+h=@(xyc) [rr(3)*exp(b*((xyc(1)*cos(xyc(2))+1)*(x(2)-rr(1))^2+(xyc(1)*sin(xyc(2))+1)*(y(2)-rr(2))^2)^0.5)-C(2);...
+rr(3)*exp(b*((xyc(1)*cos(xyc(2))+1)*(x(1)-rr(1))^2+(xyc(1)*sin(xyc(2))+1)*(y(1)-rr(2))^2)^0.5)-C(1);]
+rrr=fsolve(h,[1 pi/2])
+te=rrr(2);%得出方向
+g=@(xyc) [xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(1)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(1)-xyc(2))^2)^0.5)-C(1);
+xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(2)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(2)-xyc(2))^2)^0.5)-C(2);
+xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(3)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(3)-xyc(2))^2)^0.5)-C(3);
+xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(4)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(4)-xyc(2))^2)^0.5)-C(4)];
+re=fsolve(g,[1 1 180 1]);%得出污染源信息
+%以下是绘图
+beta=re;
+xxx=-15:0.2:15;
+yyy=-15:0.2:15;
+[XX,YY]=meshgrid(xxx,yyy);
+ff=@(xi,yi) beta(3).*exp(b.*((beta(4).*cos(te)+1).*(xi-beta(1)).^2+(beta(4).*sin(te)+1).*(yi-beta(2)).^2).^0.5);
+Z=ff(XX,YY);
+ph=mesh(XX,YY,Z);
+set(gca,'fontsize',15);
+xlabel('x/m');
+ylabel('y/m');
+zlabel('C/浓度');
+beta=floor(beta*100)/100;
+str=['(' num2str(beta(1)) ',' num2str(beta(2)) ',' num2str(beta(3)) ')'];
+
+text(beta(1)+0.2,beta(2)+0.3,beta(3),{str},'fontsize',18);
+figure;
+[D,h]=contour(XX,YY,Z);
+clabel(D,h);
+set(gca,'fontsize',12);
+xlabel('x/m');
+ylabel('y/m');
+
+yhat=ff(x,y);
+for i=1:4
+    str=['\leftarrow' '(' num2str(x(i)) ',' num2str(y(i)) ',' num2str(yhat(i)) ')'];
+hh=text(x(i),y(i),str);
+set(hh,'fontsize',15,'color',[0.6 0.6 0.6]);
+box on;
+end
+
+str=['\leftarrow' '(' num2str(beta(1)) ',' num2str(beta(2)) ',' num2str(beta(3)) ')'];
+hh=text(beta(1),beta(2),str);
+set(hh,'fontsize',15,'color',[0.6 0.6 0.6]);
+box on;
+
+    \end{lstlisting}
+以下是对方案二的灵敏度分析：
+\begin{lstlisting}
+  x=[-10 ;0;10;0;-10];y=[0;-10;0;10;0];
+  C=[158.198;114.942;151.557;158.198];
+  b=-0.02;
+ i= 1.5854;
+ k=1;
+ for te=i-1:0.01:i+1
+ g=@(xyc) [xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(1)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(1)-xyc(2))^2)^0.5)-C(1);
+ xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(2)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(2)-xyc(2))^2)^0.5)-C(2);
+ xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(3)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(3)-xyc(2))^2)^0.5)-C(3);
+ xyc(3)*exp(b*((xyc(4)*cos(te)+1)*(x(4)-xyc(1))^2+(xyc(4)*sin(te)+1)*(y(4)-xyc(2))^2)^0.5)-C(4)];
+ re=fsolve(g,[1 1 180 1]);
+ paint(k,:)=[te re];
+ k=k+1;
+ end
+ %以下是绘图
+ plot(paint(:,1),paint(:,2));
+ set(gca,'fontsize',12);
+ title('x_0的变化情况');
+ xlabel('\theta/弧度');
+ ylabel("x_0/m");
+ figure;
+ plot(paint(:,1),paint(:,3));
+ set(gca,'fontsize',12);
+ title('y_0的变化情况');
+ xlabel('\theta/弧度');
+ ylabel("y_0/m");
+ figure;
+ plot(paint(:,1),paint(:,4));
+ set(gca,'fontsize',12);
+ title('污染源浓度的变化情况');
+ xlabel('\theta/弧度');
+ ylabel("污染源浓度");
+ figure;
+ plot(paint(:,1),paint(:,5));
+ set(gca,'fontsize',12);
+ title('作用强度的变化情况');
+ xlabel('\theta/弧度');
+ ylabel("作用强度");
+ 
+  nn=logical(paint(:,1)>=i-0.25)&logical(paint(:,1)<=i+0.25);
+  h=paint(find(nn==1),:);
+  fin=h(1:3:end,:);
+  %导出数据
+  xlswrite("out.xlsx",fin);
+  
+ 
+\end{lstlisting} 
+\end{document}

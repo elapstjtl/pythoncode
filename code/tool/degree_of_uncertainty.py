@@ -1,7 +1,7 @@
 '''
 Author: your name
 Date: 2021-03-19 12:06:47
-LastEditTime: 2021-04-07 21:45:30
+LastEditTime: 2021-04-09 11:36:29
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \pythoncode\code\tool\degree_of_uncertainty.py
@@ -13,8 +13,8 @@ temp = 0
 j=0
 sum = sum2 = 0
 
-a = np.loadtxt("D:\pythoncode\code\Data\degree_of_uncertainty,csv",delimiter=",")
-
+#a = np.loadtxt("D:\pythoncode\code\Data\degree_of_uncertainty,csv",delimiter=",")
+a = [20.41,20.43,20.41,20.402,20.396]
 for i in a:
     temp+=1
     sum += i
