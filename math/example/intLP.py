@@ -1,19 +1,17 @@
 '''
 Author: your name
 Date: 2021-04-18 14:21:35
-LastEditTime: 2021-04-20 10:02:46
+LastEditTime: 2021-04-20 09:56:54
 LastEditors: Please set LastEditors
 Description: In User Settings Edit
 FilePath: \pythoncode\code\tool\intLP.py
 '''
-#导入numpy
+
 import numpy as np
-#导入numpy
 import cvxpy as cp
 #设置目标函数中变量个数
 n=3
 
-#输入目标函数的系数
 c=np.array([3,1,3])#目标函数
 
 #输入约束条件的系数矩阵（3×3）
